@@ -13,7 +13,7 @@ export regression_model, reshape_all_parameters, reshape_parameters, restructure
 export CallbackLog
 include("utils.jl")
 
-export truscott_brindley
+export truscott_brindley, selkov, selkov_sigma2
 include("eqlib.jl")
 
 export plot_weights
