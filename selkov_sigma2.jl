@@ -34,7 +34,7 @@ plot!(py, solution, linestyle=:dash, color=:blue, vars=(4))
 plot!(py, solution, linestyle=:dash, color=:purple, vars=(6))
 
 p_vars = plot(px, py, layout=(2,1))
-savefig(p_vars, "dynamics_"*experiment_name*".pdf")
+savefig(p_vars, "figures/dynamics_"*experiment_name*".pdf")
 
 
 y = Array(solution)[[1,2,5,6],:]
@@ -71,7 +71,7 @@ plot!(p_final, final_guess, linestyle=:dash, color=:blue, vars=(1), legend=false
 plot!(p_final, final_guess, linestyle=:dash, color=:red, vars=(2), legend=false)
 
 p_approx = plot(p_init,p_middle,p_final,layout=(3,1))
-savefig(p_approx, "approximation_during_training_"*experiment_name*".pdf")
+savefig(p_approx, "figures/approximation_during_training_"*experiment_name*".pdf")
 
 # σ2_ŷ = hcat([std(callback.predictions[i], dims=2).^2 for i in 1:100]...)
 # p_std = plot(((σ2_ŷ .- σ2_y).^2)')
@@ -80,4 +80,4 @@ savefig(p_approx, "approximation_during_training_"*experiment_name*".pdf")
 # plot!(repeat([σ2_y[2]], 100))
 
 p_loss = plot(callback.losses)
-savefig(p_loss, "loss_"*experiment_name*".pdf")
+savefig(p_loss, "figures/loss_"*experiment_name*".pdf")
