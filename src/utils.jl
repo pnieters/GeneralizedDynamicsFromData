@@ -135,3 +135,50 @@ function (cb::CallbackLog)(θ, loss, prediction)
 
     return false
 end
+
+function repeat_experiment(problem, net_config::OrderedDict, repetitions)
+
+    callbacks = []
+
+    for _ in 1:repetitions
+
+        UA = regression_model(values(net_config)...)
+        real_de, univ_de = problem[:equation](problem[:parameters], UA)
+
+        prob = ODEProblem(real_de, problem[:u0], problem[:tspan])
+        solution = solve(prob, problem[:solver](), saveat=problem[:ts])
+
+        θ₀ = initial_params(UA)
+
+        prob_nn = ODEProblem(univ_de, problem[:u0], problem[:tspan], θ₀)
+        # first_guess = concrete_solve(prob_nn, Vern7(), u0, θ₀, saveat=solution.t)
+
+        y = Array(solution)
+        predict(θ) = Array(concrete_solve(prob_nn, Vern7(), problem[:u0], θ, saveat=solution.t))
+        loss(θ) = problem[:loss](θ, y, predict)
+
+        callback = CallbackLog(T=Float32)
+
+        res = DiffEqFlux.sciml_train(loss, θ₀, ADAM(1e-3), cb=callback, maxiters=100)
+        push!(callbacks, callback)
+    end
+
+    return Dict([
+        :losses => [c.losses[end] for c in callbacks],
+        :parameters => hcat([c.parameters[end] for c in callbacks]...),
+        :predictions => hcat([c.predictions[end] for c in callbacks]...)
+    ])
+
+end
+
+function grid_experiment(problem, grid_config, repetitions)
+
+    result = []
+
+    for neuron_config in grid_config
+        summary = repeat_experiment(problem, neuron_config, repetitions)
+        push!(result, summary[:losses])
+    end
+
+    return reshape(result, size(grid_config))
+end

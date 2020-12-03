@@ -1,20 +1,28 @@
 module GeneralizedDynamicsFromData
 
-using OrdinaryDiffEq
+using Reexport
+
 using LinearAlgebra
 using Optim
-using DiffEqFlux
-using Flux
 using Plots
 using StatsPlots
 using Statistics
+using OrderedCollections
+
+@reexport using OrdinaryDiffEq
+@reexport using DiffEqFlux
+@reexport using Flux
 
 export regression_model, reshape_all_parameters, reshape_parameters, restructure_parameters 
 export CallbackLog
+export repeat_experiment, grid_experiment
 include("utils.jl")
 
-export truscott_brindley, selkov, selkov_sigma2
+export truscott_brindley, selkov, selkov_sigma2, ensemble_selkov
 include("eqlib.jl")
+
+export mse_loss
+include("losslib.jl")
 
 export plot_weights
 include("plotlib.jl")

@@ -69,3 +69,26 @@ function selkov_sigma2(parameters, UA, α)
 
     return (real_de, univ_de)
 end
+
+function ensemble_selkov(parameters, UA)
+    a,b = parameters
+
+    real_de = (du, u, p, t) -> begin
+        du[1] = -u[1] + a*u[2] + (u[1].^2).*u[2]
+        du[2] = b - a*u[2] - (u[1].^2)*u[2]
+        du[3] = -u[3] + a*u[4] + (u[3].^2).*u[4]
+        du[4] = b - a*u[4] - (u[3].^2)*u[4]
+    end
+
+
+    univ_de = (u, p, t) -> begin
+        x,y,xx,yy = u
+        z = UA(u,p)
+        [-x + z[1] + (x^2)*y,
+        b - a*y - (x^2)*y,
+        -xx + z[2] + (xx^2)*yy,
+        b - a*yy - (xx^2)*yy]
+    end
+
+    return (real_de, univ_de)
+end

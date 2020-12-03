@@ -4,64 +4,65 @@ using OrdinaryDiffEq
 using DiffEqFlux
 using Flux
 using Plots
+using HDF5
+using OrderedCollections
 
-experiment_name = "selkov_mse"
+experiment_name = "selkov_$(Dates.month(today()))_$(Dates.day(today()))"
+repetitions = 100
 
-parameters = [0.1, 0.6]
-UA = regression_model(2,2,32,2,tanh,Flux.glorot_normal)
+net_config = OrderedDict([
+    :inputs => 2,
+    :outputs => 1,
+    :neurons => 32,
+    :layers => 2,
+    :non_lin => tanh,
+    :initialization => Flux.glorot_normal
+]) 
 
-real_de, univ_de = selkov(parameters, UA)
-u0 = Float32[1.0, 1.0]
-tE = 50.0f0
-tspan = (0.0f0, tE)
-ts = 0.1
+problem = Dict([
+    :equation => selkov,
+    :parameters => [0.1 0.6],
+    :u0 => Float32[1.0, 1.0],
+    :tE => 50.0f0,
+    :tspan => (0.0f0, 50.0f0),
+    :ts => 0.1,
+    :solver => Vern7,
+    :loss => mse_loss
+])
 
-prob = ODEProblem(real_de, u0, tspan)
-solution = solve(prob, Vern7(), saveat=ts)
+summary = repeat_experiment(problem, net_config, repetitions)
 
 
-y = Array(solution)
-σ2_y = std(y, dims=2).^2
-θ₀ = initial_params(UA)
-λ = 1 #lol
+# p_init = plot(solution, legend=false, color=:blue, vars=(1))
+# plot!(p_init, solution, legend=false, color=:red, vars=(2))
+# plot!(p_init, first_guess, linestyle=:dash, color=:blue, vars=(1), legend=false)
+# plot!(p_init, first_guess, linestyle=:dash, color=:red, vars=(2), legend=false)
 
-prob_nn = ODEProblem(univ_de, u0, tspan, θ₀)
-first_guess = concrete_solve(prob_nn, Vern7(), u0, θ₀, saveat=solution.t)
+# middle_guess = concrete_solve(prob_nn, Vern7(), u0, callback.parameters[50])
+# p_middle = plot(solution, legend=false, color=:blue, vars=(1))
+# plot!(p_middle, solution, legend=false, color=:red, vars=(2))
+# plot!(p_middle, middle_guess, linestyle=:dash, color=:blue, vars=(1), legend=false)
+# plot!(p_middle, middle_guess, linestyle=:dash, color=:red, vars=(2), legend=false)
 
-predict(θ) = Array(concrete_solve(prob_nn, Vern7(), u0, θ, saveat=solution.t))
-loss(θ) = begin
-    ŷ = predict(θ)
-    σ2_ŷ = std(y, dims=2).^2
-    loss = sum(abs2, y .- ŷ) + λ*sum(abs2, std_y .- std_ŷ), ŷ
-end
+# final_guess = concrete_solve(prob_nn, Vern7(), u0, callback.parameters[end])
+# p_final = plot(solution, legend=false, color=:blue, vars=(1))
+# plot!(p_final, solution, legend=false, color=:red, vars=(2))
+# plot!(p_final, final_guess, linestyle=:dash, color=:blue, vars=(1), legend=false)
+# plot!(p_final, final_guess, linestyle=:dash, color=:red, vars=(2), legend=false)
 
-callback = CallbackLog(T=Float32)
-res = DiffEqFlux.sciml_train(loss, θ₀, ADAM(1e-3), cb=callback, maxiters=100)
+# p_approx = plot(p_init,p_middle,p_final,layout=(3,1))
+# # savefig(p_approx, "approximation_during_training_"*experiment_name*".pdf")
 
-p_init = plot(solution, legend=false, color=:blue, vars=(1))
-plot!(p_init, solution, legend=false, color=:red, vars=(2))
-plot!(p_init, first_guess, linestyle=:dash, color=:blue, vars=(1), legend=false)
-plot!(p_init, first_guess, linestyle=:dash, color=:red, vars=(2), legend=false)
+# σ2_ŷ = hcat([std(callback.predictions[i], dims=2).^2 for i in 1:100]...)
+# p_std = plot(((σ2_ŷ .- σ2_y).^2)')
+# plot!(σ2_ŷ')
+# plot!(repeat([σ2_y[1]], 100))
+# plot!(repeat([σ2_y[2]], 100))
 
-middle_guess = concrete_solve(prob_nn, Vern7(), u0, callback.parameters[50])
-p_middle = plot(solution, legend=false, color=:blue, vars=(1))
-plot!(p_middle, solution, legend=false, color=:red, vars=(2))
-plot!(p_middle, middle_guess, linestyle=:dash, color=:blue, vars=(1), legend=false)
-plot!(p_middle, middle_guess, linestyle=:dash, color=:red, vars=(2), legend=false)
+# p_loss = plot(callback.losses)
 
-final_guess = concrete_solve(prob_nn, Vern7(), u0, callback.parameters[end])
-p_final = plot(solution, legend=false, color=:blue, vars=(1))
-plot!(p_final, solution, legend=false, color=:red, vars=(2))
-plot!(p_final, final_guess, linestyle=:dash, color=:blue, vars=(1), legend=false)
-plot!(p_final, final_guess, linestyle=:dash, color=:red, vars=(2), legend=false)
-
-p_approx = plot(p_init,p_middle,p_final,layout=(3,1))
-# savefig(p_approx, "approximation_during_training_"*experiment_name*".pdf")
-
-σ2_ŷ = hcat([std(callback.predictions[i], dims=2).^2 for i in 1:100]...)
-p_std = plot(((σ2_ŷ .- σ2_y).^2)')
-plot!(σ2_ŷ')
-plot!(repeat([σ2_y[1]], 100))
-plot!(repeat([σ2_y[2]], 100))
-
-p_loss = plot(callback.losses)
+# h5open("selkov_100.h5", "w") do file
+#     write(file, "losses", [c.losses[end] for c in callbacks])
+#     write(file, "parameters", hcat([c.parameters[end] for c in callbacks]...))
+#     write(file, "predictions", hcat([c.predictions[end] for c in callbacks]...))
+# end
