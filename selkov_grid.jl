@@ -7,9 +7,9 @@ using Dates
 
 experiment_name = "selkov_grid_$(Dates.month(today()))_$(Dates.day(today()))"
 
-reps = 2 #100
-neurons = [8] #[2^i for i in 1:10]
-layers = [1]#[i for i in 1:10]
+reps = 100
+neurons = [2^i for i in 1:10]
+layers = [i for i in 1:10]
 
 grid_config = [OrderedDict([
     :inputs => 2,
