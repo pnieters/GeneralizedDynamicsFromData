@@ -159,7 +159,7 @@ function repeat_experiment(problem, net_config::OrderedDict, repetitions)
 
         callback = CallbackLog(T=Float32)
 
-        res = DiffEqFlux.sciml_train(loss, θ₀, ADAM(1e-3), cb=callback, maxiters=100)
+        res = DiffEqFlux.sciml_train(loss, θ₀, ADAM(1e-3), cb=callback, maxiters=200)
         push!(callbacks, callback)
     end
 
