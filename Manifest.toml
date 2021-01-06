@@ -330,7 +330,7 @@ version = "2.14.1"
 
 [[DiffEqFlux]]
 deps = ["Adapt", "BlackBoxOptim", "ConsoleProgressMonitor", "DiffEqBase", "DiffEqSensitivity", "DiffResults", "Distributions", "DistributionsAD", "Flux", "ForwardDiff", "GalacticOptim", "LinearAlgebra", "Logging", "LoggingExtras", "Optim", "Printf", "ProgressLogging", "RecursiveArrayTools", "Requires", "ReverseDiff", "StaticArrays", "TerminalLoggers", "Tracker", "Zygote", "ZygoteRules"]
-path = "/home/pascal/.julia/dev/DiffEqFlux"
+git-tree-sha1 = "09a202ef42ffc5943a7ca1683b249e160175b407"
 uuid = "aae7a2af-3d4f-5e19-a356-7da93b79d9d0"
 version = "1.24.0"
 
