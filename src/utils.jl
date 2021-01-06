@@ -154,7 +154,7 @@ function repeat_experiment(problem, net_config::OrderedDict, repetitions)
         # first_guess = concrete_solve(prob_nn, Vern7(), u0, θ₀, saveat=solution.t)
 
         y = Array(solution)
-        predict(θ) = Array(concrete_solve(prob_nn, Vern7(), problem[:u0], θ, saveat=solution.t))
+        predict(θ) = Array(concrete_solve(prob_nn, problem[:solver](), problem[:u0], θ, saveat=solution.t))
         loss(θ) = problem[:loss](θ, y, predict)
 
         callback = CallbackLog(T=Float32)

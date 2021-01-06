@@ -18,7 +18,7 @@ export CallbackLog
 export repeat_experiment, grid_experiment
 include("utils.jl")
 
-export truscott_brindley, selkov, selkov_sigma2, ensemble_selkov
+export truscott_brindley, truscott_brindley1, selkov, selkov_sigma2, ensemble_selkov
 include("eqlib.jl")
 
 export mse_loss

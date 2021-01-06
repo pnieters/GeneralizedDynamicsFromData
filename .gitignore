@@ -1,4 +1,5 @@
 *.pdf
 *.h5
+*.png
 figures/
 data/

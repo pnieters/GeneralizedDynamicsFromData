@@ -1,20 +1,17 @@
 using GeneralizedDynamicsFromData
-using Statistics
-using OrdinaryDiffEq
-using DiffEqFlux
-using Flux
 using Plots
 using HDF5
 using OrderedCollections
+using Dates
 
-experiment_name = "selkov_$(Dates.month(today()))_$(Dates.day(today()))"
-repetitions = 100
+experiment_name = "selkov_simple_$(Dates.month(today()))_$(Dates.day(today()))"
+repetitions = 1
 
 net_config = OrderedDict([
     :inputs => 2,
     :outputs => 1,
     :neurons => 32,
-    :layers => 2,
+    :layers => 0,
     :non_lin => tanh,
     :initialization => Flux.glorot_normal
 ]) 
@@ -61,8 +58,8 @@ summary = repeat_experiment(problem, net_config, repetitions)
 
 # p_loss = plot(callback.losses)
 
-# h5open("selkov_100.h5", "w") do file
-#     write(file, "losses", [c.losses[end] for c in callbacks])
-#     write(file, "parameters", hcat([c.parameters[end] for c in callbacks]...))
-#     write(file, "predictions", hcat([c.predictions[end] for c in callbacks]...))
-# end
+h5open(experiment_name*".h5", "w") do file
+    write(file, "losses", summary[:losses])
+    write(file, "parameters", summary[:parameters])
+    write(file, "predictions", summary[:predictions])
+end
