@@ -30,8 +30,8 @@ function experiment()
             :neurons => 32,
             :layers => 0,
             :non_lin => tanh,
-            :initialization => Flux.glorot_normal
-            # :initialization => init_p
+            # :initialization => Flux.glorot_normal
+            :initialization => init_p
         ]) 
 
         problem = Dict([
