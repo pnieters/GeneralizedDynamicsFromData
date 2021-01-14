@@ -9,17 +9,17 @@ function normed_ld_loss(θ, y, predict)
     ŷ = predict(θ)
     ŷ_differences = diff(ŷ, dims=2)
 
-    N = length(y_differences)
+    N = size(y_differences, 2)
 
-    loss = 1/N * sum([normed_ld(a,b) for (a,b) in zip(eachcol(y_differences), eachcol(ŷ_differences))])
-    return loss, ŷ
+    _loss = 1/N * sum([normed_ld(y_differences[:,i], ŷ_differences[:,i]) for i in 1:N])
+    return _loss, ŷ
 end
 
 function cosine_distance_loss(θ, y, predict)
     ŷ = predict(θ)
-    N = length(y)
-    loss = 1/N * sum([cosine_distance(a,b) for (a,b) in zip(eachcol(y), eachcol(ŷ))])
-    return loss, ŷ
+    N = size(y, 2)
+    _loss = 1/N * sum([cosine_distance(y[:,i], ŷ[:,i]) for i in 1:N])
+    return _loss, ŷ
 end
 
 function combined_loss(θ, y, predict)
@@ -28,16 +28,16 @@ function combined_loss(θ, y, predict)
     ŷ = predict(θ)
     ŷ_differences = diff(ŷ, dims=2)
 
-    N = length(y)
-    N_differences = length(y_differences)
+    N = size(y, 2)
+    N_differences = size(y_differences, 2)
 
-    loss_length = 1/N * sum([normed_ld(a,b) for (a,b) in zip(eachcol(y_differences), eachcol(ŷ_differences))])
-    loss_angle = 1/N * sum([cosine_distance(a,b) for (a,b) in zip(eachcol(y), eachcol(ŷ))])
+    loss_length = 1/N * sum([normed_ld(y_differences[:,i], ŷ_differences[:,i]) for i in 1:N_differences])
+    loss_angle = 1/N * sum([cosine_distance(y[:,i], ŷ[:,i]) for i in 1:N])
 
     return loss_length + loss_angle, ŷ
 end
 
-normed_ld(a,b) = (norm(a)-norm(b))/(norm(a)+norm(b))
+normed_ld(a,b) = abs(norm(a)-norm(b))/(norm(a)+norm(b))
 
 cosine_similarity(a, b) = dot(a,b) / (norm(a) * norm(b))
 cosine_distance(a, b) = (1 - cosine_similarity(a, b))/2
