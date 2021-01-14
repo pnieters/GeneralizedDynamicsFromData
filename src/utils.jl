@@ -3,7 +3,7 @@ function regression_model(input_d::Int,
                           hidden_d::Int, 
                           hidden_layers::Int, 
                           nonlinearity::Function, 
-                          initialization::Function)
+                          initialization)
    if hidden_layers == 0
       return FastChain(FastDense(input_d, output_d))
    elseif hidden_layers == 1
@@ -136,7 +136,7 @@ function (cb::CallbackLog)(θ, loss, prediction)
     return false
 end
 
-function repeat_experiment(problem, net_config::OrderedDict, repetitions)
+function repeat_experiment(problem, net_config::OrderedDict, repetitions; progress=true)
 
     callbacks = []
 
@@ -159,7 +159,7 @@ function repeat_experiment(problem, net_config::OrderedDict, repetitions)
 
         callback = CallbackLog(T=Float32)
 
-        res = DiffEqFlux.sciml_train(loss, θ₀, ADAM(1e-3), cb=callback, maxiters=200)
+        res = DiffEqFlux.sciml_train(loss, θ₀, ADAM(1e-3), cb=callback, maxiters=200; progress)
         push!(callbacks, callback)
     end
 
@@ -171,14 +171,71 @@ function repeat_experiment(problem, net_config::OrderedDict, repetitions)
 
 end
 
-function grid_experiment(problem, grid_config, repetitions)
+function grid_experiment(problem, grid_config, repetitions; progress=true)
 
     result = []
 
     for neuron_config in grid_config
-        summary = repeat_experiment(problem, neuron_config, repetitions)
+        summary = repeat_experiment(problem, neuron_config, repetitions; progress)
         push!(result, summary[:losses])
     end
 
     return reshape(result, size(grid_config))
 end
+
+# very purpose build data loader to repeat experiments with the same initializations
+mutable struct InitializationLoader{T}
+    _state::Int
+
+    n_sets::Int
+    n_parameters::Int
+    grp_id::Int
+
+    data_path::String
+    initializations::Vector{Vector{T}}
+end
+
+function InitializationLoader(grp::Int)
+    data_path = "./data/P$(grp)SelkovsimpleWeightsSolLoss.jld2"
+    groupname = "P$(grp)G"
+
+    all_parameters = load(data_path, groupname)
+    initializations = [v[1] for v in all_parameters]
+    n_sets = length(initializations)
+    n_parameters = length(initializations[1])
+
+    T = eltype(initializations[1])
+
+    return InitializationLoader{T}(
+        1,
+        n_sets,
+        n_parameters,
+        grp,
+        data_path,
+        initializations
+    )
+
+end
+
+function (il::InitializationLoader)()
+    idx = il._state
+    ret = il.initializations[idx]
+    il._state = idx + 1
+    ret
+end
+
+# ignore dimensions, in this experiment, we "know" everything.
+function (il::InitializationLoader)(dims...)
+    idx = il._state
+
+    idx > il._n_sets || error("Too many iterations for number of init param sets")
+
+    ret = il.initializations[idx]
+    il._state = idx + 1
+    ret
+end
+
+# # get a specific initialization
+# function (il::InitializationLoader)(dims...; idx=1)
+#     il.initializations[idx]
+# end
