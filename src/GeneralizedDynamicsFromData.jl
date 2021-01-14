@@ -8,6 +8,9 @@ using Plots
 using StatsPlots
 using Statistics
 using OrderedCollections
+using FileIO
+
+using JLD2
 
 @reexport using OrdinaryDiffEq
 @reexport using DiffEqFlux
@@ -16,6 +19,7 @@ using OrderedCollections
 export regression_model, reshape_all_parameters, reshape_parameters, restructure_parameters 
 export CallbackLog
 export repeat_experiment, grid_experiment
+export InitializationLoader
 include("utils.jl")
 
 export truscott_brindley, truscott_brindley1, selkov, selkov_sigma2, ensemble_selkov
