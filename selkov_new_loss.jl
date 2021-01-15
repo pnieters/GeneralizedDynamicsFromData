@@ -42,7 +42,7 @@ function experiment()
             :equation => selkov,
             :parameters => [0.1 0.6],
             :u0 => Float32[1.0, 1.0],
-            :tE => 50.0f0,
+            :tE => 30.0f0,
             :tspan => (0.0f0, 30.0f0),
             :ts => 0.1,
             :solver => Vern7,
