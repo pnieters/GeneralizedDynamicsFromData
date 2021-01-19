@@ -27,10 +27,12 @@ real_de, univ_de = selkov(parameters, UA)
 
 prob = ODEProblem(real_de, u0, tspan)
 solution = solve(prob, Vern7(), saveat=ts)
+y = Array(solution)
 
 θ₀ = initial_params(UA)
 
 prob_nn = ODEProblem(univ_de, u0, tspan, θ₀)
+predict(theta) = Array(concrete_solve(prob_nn, Vern7(), u0, theta, saveat=solution.t))
 # first_guess = concrete_solve(prob_nn, Vern7(), u0, θ₀, saveat=solution.t)
 
 alpha = LinRange(0, 1.0, 101)
@@ -39,13 +41,14 @@ w2_ax = LinRange(-1.0, 1.0, 1001)
 
 function run()
     alpha_ax = Dict()
-    @threads for (i, α) in enumerate(alpha)
 
-        loss(θ) = polar_loss(θ, y, [1.0 - α, α], predict)
+    @threads for i in 1:length(alpha)
+        a = alpha[i]
+        loss(θ) = polar_loss(θ, y, [1.0 - a, a], predict)
         error_surface = [loss([w1, w2, 0.0])[1] for w1 in w1_ax, w2 in w2_ax]
-        alpha_ax[α] = error_surface
-
+        alpha_ax[a] = error_surface
     end
+
     return alpha_ax
 end
 
