@@ -10,7 +10,7 @@ net_config = OrderedDict([
     :inputs => 2,
     :outputs => 1,
     :neurons => 32,
-    :layers => 0,
+    :layers => 2,
     :non_lin => tanh,
     :initialization => Flux.glorot_normal
 ]) 
