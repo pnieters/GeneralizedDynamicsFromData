@@ -39,11 +39,11 @@ y = Array(solution)
 predict(θ) = Array(concrete_solve(prob_nn, Vern7(), u0, θ, saveat=solution.t))
 
 
-loss_phase1(θ) = polar_loss(θ, y, [1/11, 10/11], predict)
+loss_phase1(θ) = mse_loss_norm(θ, y, predict)
 callback_phase1 = CallbackLog(T=Float32)
 res_phase1 = DiffEqFlux.sciml_train(loss_phase1, θ₀, ADAM(1e-2), cb=callback_phase1, maxiters=1_000; progress=true)
 
-θ₁ = callback_phase1.parameters[end]
-loss_phase2(θ) = polar_loss(θ, y, [1/2, 1/2],predict)
-callback_phase2 = CallbackLog(T=Float32)
-res_phase2 = DiffEqFlux.sciml_train(loss_phase2, θ₁, ADAM(1e-3), cb=callback_phase2, maxiters=500; progress=true)
+# θ₁ = callback_phase1.parameters[end]
+# loss_phase2(θ) = polar_loss(θ, y, [1/2, 1/2],predict)
+# callback_phase2 = CallbackLog(T=Float32)
+# res_phase2 = DiffEqFlux.sciml_train(loss_phase2, θ₁, ADAM(1e-3), cb=callback_phase2, maxiters=500; progress=true)

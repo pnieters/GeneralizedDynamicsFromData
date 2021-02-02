@@ -4,6 +4,7 @@ using Statistics
 using LinearAlgebra
 
 using GLMakie # CairoMakie does VectorGraphics; but doesn't do 3D?
+# using CairoMakie
 using AbstractPlotting
 using AbstractPlotting.MakieLayout
 
@@ -43,6 +44,9 @@ cosine_distance(a, b) = (1 - cosine_similarity(a, b))/2
 angular_cosine_distance(a, b) = acos(clamp(cosine_similarity(a, b), -1, 1))/π
 sqrt_cosine_distance(a,b) = sqrt(cosine_distance(a,b))
 
+normed_mse(a,b) = norm(a .- b)^2 / (0.001 + norm(a .- b)^2) # << neu
+# normed_ld(a,b) = abs(norm(a)-norm(b))/(norm(a)+norm(b)) # << "alt"
+
 function bifurcation_cut(w_min, w_max, steps)
 
     # mse
@@ -63,7 +67,8 @@ function bifurcation_cut(w_min, w_max, steps)
         guess = predict([0.0, w, 0.0])
         N = length(guess)
 
-        push!(mse, mse_loss([0.0, w, 0.0], y, predict)[1])
+        # push!(mse, mse_loss([0.0, w, 0.0], y, predict)[1])
+        push!(mse, 1/N * sum([normed_mse(a,b) for (a,b) in zip(eachcol(guess), eachcol(y))]))
 
         push!(nld, 1/N * sum([normed_ld(a, b) for (a,b) in zip(eachcol(guess), eachcol(y))]))
         push!(cnld, 1/N * sum([cos_normed_ld(a, b) for (a,b) in zip(eachcol(guess), eachcol(y))]))
@@ -82,31 +87,30 @@ end
 
 x_range = range(-0.5, stop=0.5, length=1001)
 
-outer_padding = 30
-scene, layout = layoutscene(
-    outer_padding, 
+fig = Figure(
+    outer_padding = 30, 
     resolution = (700, 1600),
     backgroundcolor = RGBf0(0.98, 0.98, 0.98)
 )
 
-ax1 = layout[1, 1] = LAxis(scene, title="MSE Loss, w_y varying")
+ax1 = fig[1, 1] = Axis(fig, title="MSE Loss, w_y varying")
 mse_line = lines!(ax1, x_range, mse)
 ax1.xlabel = "w_y"
-ax1.ylabel = "Loss MSE"
+ax1.ylabel = "Loss MSE limited"
 
-ax2 = layout[2, 1] = LAxis(scene, title="Length Metrics, w_y varying")
+ax2 = fig[2, 1] = Axis(fig, title="Length Metrics, w_y varying")
 nld_line = lines!(ax2, x_range, nld, color = :red)
 cnld_line = lines!(ax2, x_range, cnld, color = :blue)
 scnld_line = lines!(ax2, x_range, scnld, color = :green)
 ax2.xlabel = "w_y"
 ax2.ylabel = "Normalized Length Metric"
 
-ax3 = layout[3, 1] = LAxis(scene, title="Cosine Similarity, w_y varying")
+ax3 = fig[3, 1] = Axis(fig, title="Cosine Similarity, w_y varying")
 cs_line = lines!(ax3, x_range, cs)
 ax3.xlabel = "w_y"
 ax3.ylabel = "Cosine Similarity"
 
-ax4 = layout[4, 1] = LAxis(scene, title="Angular Metrics, w_y varying")
+ax4 = fig[4, 1] = Axis(fig, title="Angular Metrics, w_y varying")
 cd_line = lines!(ax4, x_range, cd, color = :red)
 acd_line = lines!(ax4, x_range, acd, color = :blue)
 ax4.xlabel = "w_y"

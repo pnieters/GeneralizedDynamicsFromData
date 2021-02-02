@@ -3,6 +3,16 @@ function mse_loss(θ, y, predict)
     loss = sum(abs2, y .- ŷ), ŷ
 end
 
+function mse_loss_norm(θ, y, predict)
+    ŷ = predict(θ)
+    N = size(y, 2)
+
+    _loss = 1/N * sum([normed_mse(y[:,i], ŷ[:,i]) for i in 1:N])
+    return _loss, ŷ 
+end
+
+normed_mse(a,b) = norm(a .- b)^2 / (0.001 + norm(a .- b)^2) # << neu
+
 function normed_ld_loss(θ, y, predict)
     y_differences = diff(y, dims=2)
 
