@@ -1,7 +1,8 @@
 *.pdf
 *.h5
 *.png
-figures/
-data/
 *.swp
 *.jld2
+figures/
+data/
+.vscode/
