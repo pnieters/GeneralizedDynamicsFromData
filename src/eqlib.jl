@@ -3,8 +3,8 @@
 
 Return the FritzHugh-Nagumo[1,2] system of ordinary differential equations as an in-place 
 function real_de!(du, u, p, t) to update the gradient vector du,
-and a partical FritzHugh-Nagumo system as a universal differential equations[3], where
-a non-linear term in the first equation and a linear term in the second equation must be 
+and a partial FritzHugh-Nagumo system as a universal differential equations[3], where
+the linear term involved in a saddle-node bifurcation in the second equation must be 
 learned from data (see below).
 
 Parameters: Real[] with parameters [b0, b1, I, E] of the FritzHugh-Nagumo system
@@ -18,8 +18,7 @@ The partial FritzHugh-Nagumo system as a UDE:
 dx/dt = x - 1/3 x^3 - y + I
 dy/dt = Eb₀ + Uₚ([x, y]) - Ey
 
-where UAₚ is the universal function approximator with weights p, and UA₁ is the first element
-of the vector valued output.
+where UAₚ is the universal function approximator with weights p.
 
 We are interested in the system near a saddle-node bifurcation with
 b0, b1, I, E = parameters = [0.9, 0.5, 1.2, 1.25] -> one stable state
@@ -56,8 +55,8 @@ end
 
 Return a genetic toggle switch (GTS) system of ordinary differential equations due to Gardner et al [1]
 as an in-place function real_de!(du, u, p, t) to update the gradient vector du,
-and a partical genetic toggle switch system as a universal differential equations[3], where
-a non-linear term in the first equation and a linear term in the second equation must be 
+and a partial genetic toggle switch system as a universal differential equations[3], where
+the non-linear term in the first equation involved in a pitchfork bifurcation must be
 learned from data (see below).
 
 Parameters: Real[] with parameters [a1, a2, k, s] of the GTS system
@@ -68,11 +67,10 @@ dx/dt = a₁/(1+yᵏ) - x
 dy/dt = a₂/(1+xˢ) - y
 
 The partial GTS system as a UDE:
-dx/dt = a₁/(1+yᵏ) - x
+dx/dt = UAₚ([x,y]) - x
 dy/dt = a₂/(1+xˢ) - y
 
-where UAₚ is the universal function approximator with weights p, and UA₁ is the first element
-of the vector valued output.
+where UAₚ is the universal function approximator with weights p.
 
 We are interested in the system near a pitchfork bifurcation with, parameterization due to
 Boshe and Ghosh[3]
@@ -86,10 +84,10 @@ learning." arXiv preprint arXiv:2001.04385 (2020).
 [3] Bose, Indrani, and Sayantari Ghosh. "Bifurcation and criticality." Journal of Statistical 
 Mechanics: Theory and Experiment 2019.4 (2019): 043403.
 """
-function genetic_toggle_switch(parameters, UA) # gardner 2000 modell parametrisierung bose 2017
+function genetic_toggle_switch(parameters, UA)
     a1, a2, k,s = parameters
 
-    real_de = (du, u, p, t) -> begin
+    real_de! = (du, u, p, t) -> begin
         du[1] = a1 ./(1 .+ u[2].^k) .- u[1]
         du[2] = a2 ./(1 .+ u[1].^s) .- u[2]
     end
@@ -102,7 +100,7 @@ function genetic_toggle_switch(parameters, UA) # gardner 2000 modell parametrisi
         a2 ./(1 .+ (x.^s)) .- y]
     end
 
-    return (real_de, univ_de)
+    return (real_de!, univ_de)
 end
 
 """
@@ -110,9 +108,9 @@ end
 
 Return the Truscott-Brindley[1] system of ordinary differential equations as an in-place 
 function real_de!(du, u, p, t) to update the gradient vector du,
-and a partical Truscott-Brindley system as a universal differential equations[2], where
-a non-linear term in the first equation and a linear term in the second equation must be 
-learned from data (see below).
+and a partial Truscott-Brindley system as a universal differential equations[2], where
+a non-linear term in the first equation and a linear term in the second equation involved
+in a Hopf bifurcation must be learned from data (see below).
 
 Parameters: Real[] with parameters [a, b, c, d] of the Truscott-Brindley system
 UA: Differentiable universal function approximator in the UDE sense: UA(u, p)
@@ -158,39 +156,40 @@ end
 """
     roessler(parameters, UA)
 
-Return the Truscott-Brindley[1] system of ordinary differential equations as an in-place 
+Return the Roessler[1] system of ordinary differential equations as an in-place 
 function real_de!(du, u, p, t) to update the gradient vector du,
-and a partical Truscott-Brindley system as a universal differential equations[2], where
-a non-linear term in the first equation and a linear term in the second equation must be 
+and a partial Roessler system as a universal differential equations[2], where
+a linear term in the second equation involved in a period doubling bifurcation must be
 learned from data (see below).
 
-Parameters: Real[] with parameters [a, b, c, d] of the Truscott-Brindley system
+Parameters: Real[] with parameters [a, b, c] of the Roessler system
 UA: Differentiable universal function approximator in the UDE sense: UA(u, p)
 
-The Truscott Brindley system:
-dx/dt = bx(1-x) - y(x²/(a²+x²))
-dy/dt = dy(x²/(a²+x²)) - cdy
+The Roessler system:
+dx/dt = - y - z
+dy/dt = x + ay
+dz/dt = b + xz - cz
 
-The partial Truscott Brindley system as a UDE:
-dx/dt = bx(1-x) + UAₚ([x, y])₁
-dy/dt = dy(x²/(a²+x²)) + UAₚ([x,y])₂
+The partial Roessler system as a UDE:
+dx/dt = - y - z
+dy/dt = x + UAₚ([x,y,z])
+dz/dt = b + xz - cz
 
-where UAₚ is the universal function approximator with weights p, and UA₁ is the first element
-of the vector valued output.
+where UAₚ is the universal function approximator with weights p.
 
-We are interested in the system near a Hopf bifurcation with
-a, b, c, d = parameters = [0.053, 0.43, 0.024/(0.05*0.7), 0.05] -> oscillatory solution
-a, b, c, d = parameters = [0.053, 0.43, 0.34, 0.05] -> steady state solution (Kirchfall)
+We are interested in the system near a period doubling bifurcation with
+a, b, c = parameters = [0.1, 0.1, 4.0]
+a, b, c = parameters = [0.1, 0.1, 6.0] -> period doubled
 
-[1] Truscott, J. E., and J. Brindley. "Ocean plankton populations as excitable media." Bulletin of 
-Mathematical Biology 56.5 (1994): 981-998.
+[1] Rössler, Otto E. "Chaotic behavior in simple reaction systems." Zeitschrift für Naturforschung 
+A 31.3-4 (1976): 259-264.
 [2] Rackauckas, Christopher, et al. "Universal differential equations for scientific machine 
 learning." arXiv preprint arXiv:2001.04385 (2020).
 """
 function roessler(parameters, UA) 
     a,b,c = parameters
 
-    real_de = (du, u, p, t) -> begin
+    real_de! = (du, u, p, t) -> begin
         du[1] = - u[2] .- u[3]
         du[2] = u[1] .+ a.*u[2]
         du[3] = b .+ u[3].*u[1] .- c.*u[3]
@@ -198,12 +197,12 @@ function roessler(parameters, UA)
 
 
     univ_de = (u, p, t) -> begin
-        x,y,w = u
-        z = UA(u,p)
-        [-y .- w,
-        x .+ z[1],
-        b .+ w.*x .- c.*w]
+        x,y,z = u
+        zf = UA(u,p)
+        [-y .- z,
+        x .+ zf[1],
+        b .+ z.*x .- c.*z]
     end
 
-    return (real_de, univ_de)
+    return (real_de!, univ_de)
 end

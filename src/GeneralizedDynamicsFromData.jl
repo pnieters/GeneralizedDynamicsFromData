@@ -28,7 +28,7 @@ include("eqlib.jl")
 export mse_loss, normed_ld_loss, cosine_distance_loss, combined_loss, polar_loss, cosine_distance, normed_ld, mse_loss_norm
 include("losslib.jl")
 
-export plot_weights
-include("plotlib.jl")
+# export plot_weights
+# include("plotlib.jl")
 
 end # module
