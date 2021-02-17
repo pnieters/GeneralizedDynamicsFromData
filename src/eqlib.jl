@@ -35,16 +35,16 @@ function fritzhugh_nagumo(parameters, UA)
     b0, b1, I, E = parameters
 
     real_de! = (du, u, p, t) -> begin
-        du[1] =  u[1] .- 1/3 .* u[1].^3 .- u[2] .+ I
-        du[2] = E .*b0 .+ E .*b1 .*u[1] .- E .*u[2] 
+        du[1] =  u[1] - 1/3 * u[1]^3 - u[2] + I
+        du[2] = E*b0 + E*b1*u[1] - E *u[2] 
     end
 
 
     univ_de = (u, p, t) -> begin
         x,y = u
         z = UA(u,p)
-        [x .- 1/3 .* x.^3 .- y .+ I,
-        E .*b0 .+ z[1] .- E .*y]
+        [x - 1/3 * x.^3 - y + I,
+        E*b0 + z[1] - E * y]
     end
 
     return (real_de!, univ_de)
@@ -85,19 +85,19 @@ learning." arXiv preprint arXiv:2001.04385 (2020).
 Mechanics: Theory and Experiment 2019.4 (2019): 043403.
 """
 function genetic_toggle_switch(parameters, UA)
-    a1, a2, k,s = parameters
+    a1, a2, k, s = parameters
 
     real_de! = (du, u, p, t) -> begin
-        du[1] = a1 ./(1 .+ u[2].^k) .- u[1]
-        du[2] = a2 ./(1 .+ u[1].^s) .- u[2]
+        du[1] = a1 /(1 + u[2]^k) - u[1]
+        du[2] = a2 /(1 + u[1]^s) - u[2]
     end
 
 
     univ_de = (u, p, t) -> begin
         x,y = u
         z = UA(u,p)
-        [z[1] .- x,
-        a2 ./(1 .+ (x.^s)) .- y]
+        [z[1] - x,
+        a2 /(1 + (x^s)) - y]
     end
 
     return (real_de!, univ_de)
@@ -111,6 +111,8 @@ function real_de!(du, u, p, t) to update the gradient vector du,
 and a partial Truscott-Brindley system as a universal differential equations[2], where
 a non-linear term in the first equation and a linear term in the second equation involved
 in a Hopf bifurcation must be learned from data (see below).
+
+!! The Truscott Brindley system is not well behaved when solved numerically!
 
 Parameters: Real[] with parameters [a, b, c, d] of the Truscott-Brindley system
 UA: Differentiable universal function approximator in the UDE sense: UA(u, p)
@@ -139,8 +141,8 @@ function truscott_brindley(parameters, UA)
     a,b,c,d = parameters
 
     real_de! = (du, u, p, t) -> begin
-        du[1] = b*u[1].*(1-u[1]) - u[2].*((u[1].^2)./(a^2+u[1].^2))
-        du[2] = d*u[2].*((u[1].^2)./(a^2+u[1].^2)) - c*d*u[2]
+        du[1] = b*u[1]*(1-u[1]) - u[2]*((u[1]^2)/(a^2+u[1]^2))
+        du[2] = d*u[2]*((u[1]^2)/(a^2+u[1]^2)) - c*d*u[2]
     end
 
     univ_de = (u, p, t) -> begin
@@ -190,18 +192,18 @@ function roessler(parameters, UA)
     a,b,c = parameters
 
     real_de! = (du, u, p, t) -> begin
-        du[1] = - u[2] .- u[3]
-        du[2] = u[1] .+ a.*u[2]
-        du[3] = b .+ u[3].*u[1] .- c.*u[3]
+        du[1] = - u[2] - u[3]
+        du[2] = u[1] + a*u[2]
+        du[3] = b + u[3]*u[1] - c*u[3]
     end
 
 
     univ_de = (u, p, t) -> begin
         x,y,z = u
         zf = UA(u,p)
-        [-y .- z,
-        x .+ zf[1],
-        b .+ z.*x .- c.*z]
+        [-y - z,
+        x + zf[1],
+        b + z*x - c*z]
     end
 
     return (real_de!, univ_de)
