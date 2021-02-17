@@ -36,8 +36,8 @@ y = Array(real_solution)
 θ₀ = initial_params(UA)
 prob_nn = ODEProblem(univ_de, u₀, tspan, θ₀)
 
-first_guess = concrete_solve(prob_nn, Vern7(), u₀, θ₀, saveat=real_solution.t)
-predict(θ) = Array(concrete_solve(prob_nn, Vern7(), u₀, θ, saveat=real_solution.t))
+first_guess = concrete_solve(prob_nn, AutoTsit5(Rosenbrock23()), u₀, θ₀, saveat=real_solution.t)
+predict(θ) = Array(concrete_solve(prob_nn, AutoTsit5(Rosenbrock23()), u₀, θ, saveat=real_solution.t))
 loss(θ) = polar_loss(θ, y, loss_weights, predict)
 
 #### train the UDE with ADAM
