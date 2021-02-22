@@ -1,4 +1,8 @@
 using GeneralizedDynamicsFromData
+using ModelingToolkit
+using DataDrivenDiffEq
+using LinearAlgebra
+using Plots
 
 #### Setup parameters of the ODE, UDE system and training
 parameters_one_stable = Float32[0.9, 0.5, 1.2, 1.25]
@@ -11,8 +15,6 @@ tspan =(0.0f0, 5.0f0)
 s = 0.1
 
 loss_weights = Float32[1/2, 1/2]
-λ = 1e-7
-lr = 1e-2
 max_iters = 1000
 
 #### Setup functions for neural network and differential equations
@@ -39,10 +41,34 @@ prob_nn = ODEProblem(univ_de, u₀, tspan, θ₀)
 
 first_guess = concrete_solve(prob_nn, Tsit5(), u₀, θ₀, saveat=real_solution.t)
 predict(θ) = Array(concrete_solve(prob_nn, Tsit5(), u₀, θ, saveat=real_solution.t))
-loss(θ) = polar_loss(θ, y, loss_weights, λ, predict)
+loss(θ) = polar_loss(θ, y, loss_weights, predict)
 
 #### train the UDE with ADAM
 callback = CallbackLog(T=Float32)
-res_adam = DiffEqFlux.sciml_train(loss, θ₀, ADAM(lr), cb=callback, maxiters=max_iters)
+opt = Flux.Optimiser(WeightDecay(1e-4), ExpDecay(1e-1,0.5,100,1e-4), ADAM())
+res = DiffEqFlux.sciml_train(loss, θ₀, opt, cb=callback, maxiters=max_iters)
 
-#todo: sindy optimization!
+trained_parameters = res.minimizer
+ŷ = predict(trained_parameters)
+ŷ_derivs = UA(ŷ, trained_parameters)
+
+@variables u[1:2]
+b = polynomial_basis(u,5)
+basis = Basis(b, u)
+
+opt = SR3(Float32(1e-2), Float32(1e-1))
+λ = exp10.(-7:0.1:5)
+g(x) = x[1] > 1 ? Inf : norm(x, 2)
+
+Ψ = SINDy(ŷ, 
+          ŷ_derivs, 
+          basis, 
+          λ, 
+          opt, 
+          g = g, 
+          maxiter = 50000, 
+          normalize = true, 
+          denoise = true, 
+          convergence_error = Float32(1e-10))
+println(Ψ)
+print_equations(Ψ)

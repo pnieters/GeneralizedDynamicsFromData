@@ -41,10 +41,7 @@ predict(θ) = Array(concrete_solve(prob_nn, AutoTsit5(Rosenbrock23()), u₀, θ,
 loss(θ) = polar_loss(θ, y, loss_weights, predict)
 
 #### train the UDE with ADAM
-callback_adam = CallbackLog(T=Float32)
-res_adam = DiffEqFlux.sciml_train(loss, θ₀, ADAM(lr), cb=callback_adam, maxiters=100)
-
-callback_bfgs = CallbackLog(T=Float32)
-res_bfgs = DiffEqFlux.sciml_train(loss, res_adam.minimizer, BFGS(initial_stepnorm=0.01), cb=callback_bfgs, maxiters = 300)
+opt = Flux.Optimiser(WeightDecay(1e-4), ExpDecay(1e-1,0.4,100,1e-4), ADAM())
+res = DiffEqFlux.sciml_train(loss, θ₀, opt, cb=callback, maxiters=max_iters)
 
 #todo: sindy optimization!
