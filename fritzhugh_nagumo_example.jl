@@ -20,7 +20,7 @@ max_iters = 1000
 #### Setup functions for neural network and differential equations
 UA = regression_model(
     2, # input_d
-    2, # output_d
+    1, # output_d
     16, # hidden_d
     1, # hidden_layers
     tanh, # nonlinearity
