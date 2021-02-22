@@ -136,30 +136,40 @@ function (cb::CallbackLog)(θ, loss, prediction)
     return false
 end
 
-function repeat_experiment(problem, net_config::OrderedDict, repetitions; progress=true)
+function repeat_experiment(problem, 
+                           net_config::OrderedDict, 
+                           repetitions::Int; 
+                           ε = 0.0, 
+                           progress=true)
 
     callbacks = []
+
+    real_de, _ = problem[:equation](problem[:parameters], x->nothing)
+    prob = ODEProblem(real_de, problem[:u0], problem[:tspan])
+    solution = solve(prob, problem[:solver](), saveat=problem[:ts])
+    y = Array(solution)
 
     for _ in 1:repetitions
 
         UA = regression_model(values(net_config)...)
-        real_de, univ_de = problem[:equation](problem[:parameters], UA)
-
-        prob = ODEProblem(real_de, problem[:u0], problem[:tspan])
-        solution = solve(prob, problem[:solver](), saveat=problem[:ts])
+        _ , univ_de = problem[:equation](problem[:parameters], UA)
 
         θ₀ = initial_params(UA)
-
         prob_nn = ODEProblem(univ_de, problem[:u0], problem[:tspan], θ₀)
-        # first_guess = concrete_solve(prob_nn, Vern7(), u0, θ₀, saveat=solution.t)
 
-        y = Array(solution)
+        ỹ = y .+ ε * randn(eltype(y), size(y))
+
         predict(θ) = Array(concrete_solve(prob_nn, problem[:solver](), problem[:u0], θ, saveat=solution.t))
         loss(θ) = problem[:loss](θ, y, predict)
 
         callback = CallbackLog(T=Float32)
 
-        res = DiffEqFlux.sciml_train(loss, θ₀, ADAM(1e-3), cb=callback, maxiters=1_000; progress)
+        res = DiffEqFlux.sciml_train(loss, 
+                                     θ₀, 
+                                     problem[:optimizer](), 
+                                     cb=callback, 
+                                     maxiters=problem[:max_iter]; 
+                                     progress)
         push!(callbacks, callback)
     end
 
@@ -167,7 +177,7 @@ function repeat_experiment(problem, net_config::OrderedDict, repetitions; progre
         :losses => [c.losses[end] for c in callbacks],
         :parameters => hcat([c.parameters[end] for c in callbacks]...),
         :predictions => hcat([c.predictions[end] for c in callbacks]...)
-    ])
+    ]), callbacks
 
 end
 
