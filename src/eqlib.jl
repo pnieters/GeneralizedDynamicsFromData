@@ -208,3 +208,53 @@ function roessler(parameters, UA)
 
     return (real_de!, univ_de)
 end
+
+""" NPZ Model, the short documentation!
+parameters_oscillation = Float32[0.2, 0.2, 0.4, 1.5, 0.03, 0.05, 0.15, 0.04, 0.6, 0.25, 0.33, 0.5, 0.6, 0.035]
+parameters_steadystate = Float32[0.2, 0.2, 0.4, 1.0, 0.03, 0.05, 0.15, 0.04, 0.6, 0.25, 0.33, 0.5, 0.6, 0.035]
+
+u₀ = Float32[0.4, 0.1, 0.05]
+
+tspan = (0.0f0, 80.0) 
+s = 1.0
+loss_weights = Float32[0.4, 0.6]
+lr = 1e-3
+
+UA = regression_model(
+    3, # input_d
+    1, # output_d
+    32, # hidden_d
+    1, # hidden_layers
+    tanh, # nonlinearity
+    Flux.glorot_normal # initialization
+)
+
+θ₀ = 1e-4 .* initial_params(UA)
+"""
+function NPZ(parameters, UA)
+    a, b, c, d, e, k, r, s, N0, al, be, ga, la, nu = parameters
+
+    real_de! = (du, u, p, t) -> begin
+        du[1] = -1.0*(u[1]/(e + u[1]))*(a/(b + c*u[2]))*u[2] +
+                r*u[2] + 
+                ((be*la*u[2]^2*u[3])/(nu^2+u[2]^2)) + 
+                ga*d*u[3]^2 + 
+                k*(N0-u[1])
+        du[2] = (u[1]/(e + u[1]))*(a/(b + c*u[2]))*u[2] - 
+                r.*u[2] - 
+                ((la* u[2]^2*u[3])/(nu^2 + u[2]^2)) - 
+                (s + k)*u[2]
+        du[3] = ((al*la*u[2]^2*u[3])/(nu^2+u[2]^2)) - 
+                d*u[3]^2
+    end
+
+    univ_de = (u, p, t) -> begin
+        N,P,Z = u
+        z = UA(u,p)
+        [-1.0*(N/(e + N))*(a/(b + c*P))*P + r*P + ((be*la* P^2*Z)/(nu^2 + P^2)) + ga*d*Z^2 + k*(N0-N),
+        (N/(e + N)) * (a/(b + c*P))*P - r*P - ((la* P^2 *Z)/(nu^2 + P^2)) - (s+k)*P,
+        ((al*la*P^2*Z)/(nu^2 + P^2)) + z[1]]
+    end
+
+    return (real_de!, univ_de)
+end
