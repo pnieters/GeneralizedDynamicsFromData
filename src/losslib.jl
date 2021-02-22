@@ -47,12 +47,11 @@ function combined_loss(θ, y, predict)
     return loss_length + loss_angle, ŷ
 end
 
-function polar_loss(θ, y, w, λ, predict)
+function polar_loss(θ, y, w, predict)
     ŷ = predict(θ)
     N = size(ŷ, 2)
-    loss = 1/N * sum(w[1] * [normed_ld(y[:,i], ŷ[:,i]) for i in 1:N] +
-                     w[2] * [cosine_distance(y[:,i], ŷ[:,i]) for i in 1:N]) +
-           λ * sum(θ.^2)
+    loss = sum(w[1] * [normed_ld(y[:,i], ŷ[:,i]) for i in 1:N] +
+               w[2] * [cosine_distance(y[:,i], ŷ[:,i]) for i in 1:N])
     return loss, ŷ
 end
 
