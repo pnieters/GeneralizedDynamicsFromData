@@ -2,7 +2,7 @@ using GeneralizedDynamicsFromData
 using OrderedCollections
 
 experiment_name = "fritzhugh_nagumo_statistics"
-repetitions = 1
+repetitions = 4
 
 weight_decay = 1e-4
 η = 1e-1
@@ -26,7 +26,7 @@ net_config = OrderedDict([
     :initialization => Flux.glorot_normal
 ]) 
 
-problem_one_stable = Dict([:equation => roessler,
+problem_one_stable = Dict([:equation => fritzhugh_nagumo,
                            :parameters => Float32[0.9, 0.5, 1.2, 1.25],
                            :u0 => Float32[-2.0, -0.5],
                            :tspan => (0.0f0, 5.0f0),
@@ -37,9 +37,9 @@ problem_one_stable = Dict([:equation => roessler,
                            :loss => construct_loss]
                       )
 
-summary1s, callbacks1s = repeat_experiment(problem_one_stable, net_config, repetitions; ε = 0.01)
+summary1s, callbacks1s = repeat_experiment(problem_one_stable, net_config, repetitions; ε = 1e-2)
 
-problem_two_stable = Dict([:equation => roessler,
+problem_two_stable = Dict([:equation => fritzhugh_nagumo,
                            :parameters => Float32[0.9, 0.5, 1.9, 1.25],
                            :u0 => Float32[-2.0, -0.5],
                            :tspan => (0.0f0, 5.0f0),

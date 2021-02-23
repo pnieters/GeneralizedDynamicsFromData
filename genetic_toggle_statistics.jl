@@ -26,7 +26,7 @@ net_config = OrderedDict([
     :initialization => Flux.glorot_normal
 ]) 
 
-problem_one_stable = Dict([:equation => roessler,
+problem_one_stable = Dict([:equation => genetic_toggle_switch,
                            :parameters => Float32[1.5, 1.5, 2.0, 2.0],
                            :u0 => Float32[2.0, 4.0],
                            :tspan => (0.0f0, 15.0f0),
@@ -39,7 +39,7 @@ problem_one_stable = Dict([:equation => roessler,
 
 summary1s, callbacks1s = repeat_experiment(problem_one_stable, net_config, repetitions; ε = 0.01)
 
-problem_two_stable = Dict([:equation => roessler,
+problem_two_stable = Dict([:equation => genetic_toggle_switch,
                            :parameters => Float32[3.5, 3.5, 2.0, 2.0],
                            :u0 => Float32[2.0, 4.0],
                            :tspan => (0.0f0, 15.0f0),
