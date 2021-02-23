@@ -143,6 +143,8 @@ function repeat_experiment(problem,
                            progress=true)
 
     callbacks = []
+    min_losses = []
+    min_params = []
 
     real_de, _ = problem[:equation](problem[:parameters], x->nothing)
     prob = ODEProblem(real_de, problem[:u0], problem[:tspan])
@@ -171,12 +173,13 @@ function repeat_experiment(problem,
                                      maxiters=problem[:max_iter]; 
                                      progress)
         push!(callbacks, callback)
+        push!(min_losses, res.minimum)
+        push!(min_params, res.minimizer)
     end
 
     return Dict([
-        :losses => [c.losses[end] for c in callbacks],
-        :parameters => hcat([c.parameters[end] for c in callbacks]...),
-        :predictions => hcat([c.predictions[end] for c in callbacks]...)
+        :losses => min_losses,
+        :parameters => min_params,
     ]), callbacks
 
 end
@@ -185,8 +188,8 @@ function grid_experiment(problem, grid_config, repetitions; progress=true)
 
     result = []
 
-    for neuron_config in grid_config
-        summary = repeat_experiment(problem, neuron_config, repetitions; progress)
+    for net_config in grid_config
+        summary = repeat_experiment(problem, net_config, repetitions; progress)
         push!(result, summary[:losses])
     end
 
