@@ -149,7 +149,7 @@ function repeat_experiment(problem,
     solution = solve(prob, problem[:solver](), saveat=problem[:ts])
     y = Array(solution)
 
-    for _ in 1:repetitions
+    Threads.@threads for _ in 1:repetitions
 
         UA = regression_model(values(net_config)...)
         _ , univ_de = problem[:equation](problem[:parameters], UA)
