@@ -178,8 +178,8 @@ function repeat_experiment(problem,
     end
 
     return Dict([
-        :losses => min_losses,
-        :parameters => min_params,
+        "losses" => min_losses,
+        "parameters" => min_params,
     ]), callbacks
 
 end

@@ -2,7 +2,7 @@ using GeneralizedDynamicsFromData
 using OrderedCollections
 
 experiment_name = "roessler_statistics"
-repetitions = 1
+repetitions = 100
 
 weight_decay = 1e-4
 η = 1e-1
@@ -37,7 +37,17 @@ problem_period1 = Dict([:equation => roessler,
                         :loss => construct_loss]
                       )
 
-summary1, callbacks1 = repeat_experiment(problem_period1, net_config, repetitions; ε = 0.01)
+for noise in [5e-3, 1e-3, 1e-4, 1e-5]
+  summary, callbacks = repeat_experiment(problem_period1, 
+                                        net_config, 
+                                        repetitions; 
+                                        ε = noise, 
+                                        progress=false)
+  filename_cb = experiment_name*"_1s_"*string(noise)*"_all.jld2"
+  filename_sum = experiment_name*"_1s_"*string(noise)*".jld2"
+  save(filename_cb, Dict("callbacks" => callbacks))
+  save(filename_sum, summary)
+end
 
 problem_period1 = Dict([:equation => roessler,
                         :parameters => Float32[0.1, 0.1, 6.0],
@@ -50,4 +60,14 @@ problem_period1 = Dict([:equation => roessler,
                         :loss => construct_loss]
                       )
 
-summary2, callbacks2 = repeat_experiment(problem_period2, net_config, repetitions; ε = 0.01)
+for noise in [5e-3, 1e-3, 1e-4, 1e-5]
+  summary, callbacks = repeat_experiment(problem_period2, 
+                                        net_config, 
+                                        repetitions; 
+                                        ε = noise, 
+                                        progress=false)
+  filename_cb = experiment_name*"_1s_"*string(noise)*"_all.jld2"
+  filename_sum = experiment_name*"_1s_"*string(noise)*".jld2"
+  save(filename_cb, Dict("callbacks" => callbacks))
+  save(filename_sum, summary)
+end

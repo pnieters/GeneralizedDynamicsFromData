@@ -1,8 +1,10 @@
 using GeneralizedDynamicsFromData
 using OrderedCollections
+using JLD2
+using FileIO
 
 experiment_name = "fritzhugh_nagumo_statistics"
-repetitions = 4
+repetitions = 100
 
 weight_decay = 1e-4
 η = 1e-1
@@ -37,7 +39,17 @@ problem_one_stable = Dict([:equation => fritzhugh_nagumo,
                            :loss => construct_loss]
                       )
 
-summary1s, callbacks1s = repeat_experiment(problem_one_stable, net_config, repetitions; ε = 1e-2)
+for noise in [1e-2, 5e-3, 1e-3, 1e-4]
+  summary, callbacks = repeat_experiment(problem_one_stable, 
+                                        net_config, 
+                                        repetitions; 
+                                        ε = noise, 
+                                        progress=false)
+  filename_cb = experiment_name*"_1s_"*string(noise)*"_all.jld2"
+  filename_sum = experiment_name*"_1s_"*string(noise)*".jld2"
+  save(filename_cb, Dict("callbacks" => callbacks))
+  save(filename_sum, summary)
+end
 
 problem_two_stable = Dict([:equation => fritzhugh_nagumo,
                            :parameters => Float32[0.9, 0.5, 1.9, 1.25],
@@ -50,4 +62,14 @@ problem_two_stable = Dict([:equation => fritzhugh_nagumo,
                            :loss => construct_loss]
                          )
 
-summary2s, callbacks2s = repeat_experiment(problem_two_stable, net_config, repetitions; ε = 0.01)
+for noise in [1e-2, 5e-3, 1e-3, 1e-4]
+  summary, callbacks = repeat_experiment(problem_two_stable, 
+                                        net_config, 
+                                        repetitions; 
+                                        ε = noise, 
+                                        progress=false)
+  filename_cb = experiment_name*"_2s_"*string(noise)*"_all.jld2"
+  filename_sum = experiment_name*"_2s_"*string(noise)*".jld2"
+  save(filename_cb, Dict("callbacks" => callbacks))
+  save(filename_sum, summary)
+end
