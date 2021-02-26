@@ -27,8 +27,8 @@ net_config = OrderedDict([
 ]) 
 
 problem_one_stable = Dict([:equation => genetic_toggle_switch,
-                           :parameters => Float32[1.5, 1.5, 2.0, 2.0],
-                           :u0 => Float32[2.0, 4.0],
+                           :parameters => Float64[1.5, 1.5, 2.0, 2.0],
+                           :u0 => Float64[2.0, 4.0],
                            :tspan => (0.0f0, 15.0f0),
                            :ts => 0.1,
                            :solver => Tsit5,
@@ -50,8 +50,8 @@ for noise in [1e-2, 5e-3, 1e-3, 1e-4]
 end
 
 problem_two_stable = Dict([:equation => genetic_toggle_switch,
-                           :parameters => Float32[3.5, 3.5, 2.0, 2.0],
-                           :u0 => Float32[2.0, 4.0],
+                           :parameters => Float64[3.5, 3.5, 2.0, 2.0],
+                           :u0 => Float64[2.0, 4.0],
                            :tspan => (0.0f0, 15.0f0),
                            :ts => 0.1,
                            :solver => Tsit5,

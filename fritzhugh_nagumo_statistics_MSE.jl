@@ -27,8 +27,8 @@ net_config = OrderedDict([
 ]) 
 
 problem_one_stable = Dict([:equation => fritzhugh_nagumo,
-                           :parameters => Float32[0.9, 0.5, 1.2, 1.25],
-                           :u0 => Float32[-2.0, -0.5],
+                           :parameters => Float64[0.9, 0.5, 1.2, 1.25],
+                           :u0 => Float64[-2.0, -0.5],
                            :tspan => (0.0f0, 5.0f0),
                            :ts => 0.1,
                            :solver => Tsit5,
@@ -50,8 +50,8 @@ for noise in [1e-2, 5e-3, 1e-3, 1e-4]
 end
 
 problem_two_stable = Dict([:equation => fritzhugh_nagumo,
-                           :parameters => Float32[0.9, 0.5, 1.9, 1.25],
-                           :u0 => Float32[-2.0, -0.5],
+                           :parameters => Float64[0.9, 0.5, 1.9, 1.25],
+                           :u0 => Float64[-2.0, -0.5],
                            :tspan => (0.0f0, 5.0f0),
                            :ts => 0.1,
                            :solver => Tsit5,

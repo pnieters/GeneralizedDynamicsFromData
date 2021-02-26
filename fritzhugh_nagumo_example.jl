@@ -5,16 +5,16 @@ using LinearAlgebra
 using Plots
 
 #### Setup parameters of the ODE, UDE system and training
-parameters_one_stable = Float32[0.9, 0.5, 1.2, 1.25]
-parameters_two_stable = Float32[0.9, 0.5, 1.9, 1.25]
+parameters_one_stable = Float64[0.9, 0.5, 1.2, 1.25]
+parameters_two_stable = Float64[0.9, 0.5, 1.9, 1.25]
 
 parameters = parameters_one_stable
 
-u₀ = Float32[-2.0, -0.5]
+u₀ = Float64[-2.0, -0.5]
 tspan =(0.0f0, 5.0f0)
 s = 0.1
 
-loss_weights = Float32[1/2, 1/2]
+loss_weights = Float64[1/2, 1/2]
 max_iters = 1000
 
 #### Setup functions for neural network and differential equations
@@ -44,7 +44,7 @@ predict(θ) = Array(concrete_solve(prob_nn, Tsit5(), u₀, θ, saveat=real_solut
 loss(θ) = polar_loss(θ, y, loss_weights, predict)
 
 #### train the UDE with ADAM
-callback = CallbackLog(T=Float32)
+callback = CallbackLog(T=Float64)
 opt = Flux.Optimiser(WeightDecay(1e-4), ExpDecay(1e-1,0.5,100,1e-4), ADAM())
 res = DiffEqFlux.sciml_train(loss, θ₀, opt, cb=callback, maxiters=max_iters)
 
@@ -56,7 +56,7 @@ ŷ_derivs = UA(ŷ, trained_parameters)
 b = polynomial_basis(u,5)
 basis = Basis(b, u)
 
-opt = SR3(Float32(1e-2), Float32(1e-1))
+opt = SR3(Float64(1e-2), Float64(1e-1))
 λ = exp10.(-7:0.1:5)
 g(x) = x[1] > 1 ? Inf : norm(x, 2)
 
@@ -69,6 +69,6 @@ g(x) = x[1] > 1 ? Inf : norm(x, 2)
           maxiter = 50000, 
           normalize = true, 
           denoise = true, 
-          convergence_error = Float32(1e-10))
+          convergence_error = Float64(1e-10))
 println(Ψ)
 print_equations(Ψ)

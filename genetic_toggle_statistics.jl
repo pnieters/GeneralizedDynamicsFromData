@@ -45,8 +45,8 @@ for noise in [1e-2, 5e-3, 1e-3, 1e-4]
                                         repetitions; 
                                         ε = noise, 
                                         progress=false)
-  filename_cb = experiment_name*"_1s_"*string(noise)*"_all.jld2"
-  filename_sum = experiment_name*"_1s_"*string(noise)*".jld2"
+  filename_cb = joinpath("./data", experiment_name*"_1s_"*string(noise)*"_all.jld2")
+  filename_sum = joinpath("./data", experiment_name*"_1s_"*string(noise)*".jld2")
   save(filename_cb, Dict("callbacks" => callbacks))
   save(filename_sum, summary)
 end
@@ -68,8 +68,8 @@ for noise in [1e-2, 5e-3, 1e-3, 1e-4]
                                         repetitions; 
                                         ε = noise, 
                                         progress=false)
-  filename_cb = experiment_name*"_1s_"*string(noise)*"_all.jld2"
-  filename_sum = experiment_name*"_1s_"*string(noise)*".jld2"
+  filename_cb = joinpath("./data", experiment_name*"_1s_"*string(noise)*"_all.jld2")
+  filename_sum = joinpath("./data", experiment_name*"_1s_"*string(noise)*".jld2")
   save(filename_cb, Dict("callbacks" => callbacks))
   save(filename_sum, summary)
 end
