@@ -47,7 +47,7 @@ for noise in [1e-2, 5e-3, 1e-3, 1e-4]
                                         progress=false)
   filename_cb = joinpath("./data/", experiment_name*"_1s_"*string(noise)*"_all.jld2")
   filename_sum = joinpath("./data/", experiment_name*"_1s_"*string(noise)*".jld2")
-  save(filename_cb, Dict("callbacks" => callbacks))
+  callbacks_to_hdf5(callbacks, filename_cb)
   save(filename_sum, summary)
 end
 
@@ -70,6 +70,6 @@ for noise in [1e-2, 5e-3, 1e-3, 1e-4]
                                         progress=false)
   filename_cb = joinpath("./data/", experiment_name*"_2s_"*string(noise)*"_all.jld2")
   filename_sum = joinpath("./data/", experiment_name*"_2s_"*string(noise)*".jld2")
-  save(filename_cb, Dict("callbacks" => callbacks))
+  callbacks_to_hdf5(callbacks, filename_cb)
   save(filename_sum, summary)
 end

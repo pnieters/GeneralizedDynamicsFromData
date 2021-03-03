@@ -11,13 +11,14 @@ using OrderedCollections
 using FileIO
 
 using JLD2
+using HDF5
 
 @reexport using OrdinaryDiffEq
 @reexport using DiffEqFlux
 @reexport using Flux
 
 export regression_model, reshape_all_parameters, reshape_parameters, restructure_parameters 
-export CallbackLog
+export CallbackLog, callbacks_to_hdf5
 export repeat_experiment, grid_experiment
 export InitializationLoader
 include("utils.jl")
