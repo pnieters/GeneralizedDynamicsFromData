@@ -248,7 +248,16 @@ function (il::InitializationLoader)(dims...)
     ret
 end
 
-# # get a specific initialization
-# function (il::InitializationLoader)(dims...; idx=1)
-#     il.initializations[idx]
-# end
+function callbacks_to_hdf5(data, fn::String)
+    losses = hcat([cb.losses for cb in data]...)
+    # Pred is a N_DIMS x T_STEPS x TRAINING_ITERATION x REPTITION
+    N_DIMS = size(data[1].predictions[1])[1] # homogeniety of the data is required!
+    preds = cat([cat([hcat([pred[i,:] for pred in cb.predictions]...) for cb in data]...; dims=3) for i in 1:N_DIMS]...;
+               dims = 4) |> arr -> permutedims(arr, [4,1,2,3])
+    params = cat([hcat([param for param in cb.parameters]...) for cb in data]...; dims=3) 
+    h5open(fn, "w") do file
+        file["losses"] = losses
+        file["predictions"] = preds
+        file["parameters"] = params
+    end
+end
