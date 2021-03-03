@@ -15,7 +15,7 @@ weight_decay = 1e-4
 construct_optimiser() = Flux.Optimiser(WeightDecay(weight_decay), 
                                        ExpDecay(η,η_decay_rate,η_decay_step,η_limit), 
                                        ADAM())
-construct_loss(θ, y, predict) = polar_loss(θ, y, predict)
+construct_loss(θ, y, predict) = mse_loss(θ, y, predict)
 
 net_config = OrderedDict([
     :inputs => 2,
