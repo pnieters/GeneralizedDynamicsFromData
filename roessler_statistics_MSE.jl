@@ -3,7 +3,7 @@ using OrderedCollections
 using JLD2
 using FileIO
 
-experiment_name = "roessler_statistics"
+experiment_name = "roessler_statistics_MSE"
 repetitions = 100
 
 weight_decay = 1e-4
@@ -49,7 +49,7 @@ for noise in [5e-3, 1e-3, 1e-4, 1e-5]
   save(filename_sum, summary)
 end
 
-problem_period1 = Dict([:equation => roessler,
+problem_period2 = Dict([:equation => roessler,
                         :parameters => Float64[0.1, 0.1, 6.0],
                         :u0 => Float64[1.0, 1.0, 1.0],
                         :tspan => (0.0f0, 10.0f0),

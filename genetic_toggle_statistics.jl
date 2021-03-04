@@ -63,7 +63,7 @@ problem_two_stable = Dict([:equation => genetic_toggle_switch,
                          )
 
 for noise in [1e-2, 5e-3, 1e-3, 1e-4]
-  summary, callbacks = repeat_experiment(problem_one_stable, 
+  summary, callbacks = repeat_experiment(problem_two_stable, 
                                         net_config, 
                                         repetitions; 
                                         ε = noise, 
