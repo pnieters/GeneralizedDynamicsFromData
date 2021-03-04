@@ -45,7 +45,7 @@ for noise in [5e-3, 1e-3, 1e-4, 1e-5]
                                         repetitions; 
                                         ε = noise, 
                                         progress=false)
-  filename_cb = joinpath("./data/", experiment_name*"_p1_"*string(noise)*"_all.jld2")
+  filename_cb = joinpath("./data/", experiment_name*"_p1_"*string(noise)*"_all.h5")
   filename_sum = joinpath("./data/", experiment_name*"_p1_"*string(noise)*".jld2")
   callbacks_to_hdf5(callbacks, filename_cb)
   save(filename_sum, summary)
@@ -68,7 +68,7 @@ for noise in [5e-3, 1e-3, 1e-4, 1e-5]
                                         repetitions; 
                                         ε = noise, 
                                         progress=false)
-  filename_cb = joinpath("./data/", experiment_name*"_p2_"*string(noise)*"_all.jld2")
+  filename_cb = joinpath("./data/", experiment_name*"_p2_"*string(noise)*"_all.h5")
   filename_sum = joinpath("./data/", experiment_name*"_p2_"*string(noise)*".jld2")
   callbacks_to_hdf5(callbacks, filename_cb)
   save(filename_sum, summary)
