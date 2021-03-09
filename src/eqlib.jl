@@ -209,6 +209,43 @@ function roessler(parameters, UA)
     return (real_de!, univ_de)
 end
 
+""" Selkov Model
+parameters_oscillation = Float32[0.1, 0.6]
+parameters_steadystate = Float32[0.1, 0.15]
+
+u₀ = Float32[1.0, 1.0]
+
+tspan = (0.0f0, 15.0f) 
+s = 0.1
+loss_weights = Float32[0.2, 0.8]
+
+UA = regression_model(
+    2, # input_d
+    1, # output_d
+    16, # hidden_d
+    1, # hidden_layers
+    tanh, # nonlinearity
+    Flux.glorot_normal # initialization
+)
+"""
+function selkov(parameters, UA)
+    a, b = parameters
+
+    real_de! = (du, u, p, t) -> begin
+        du[1] = -u[1] + a*u[2] + (u[1]^2)*u[2]
+        du[2] = b - a*u[2] - (u[1]^2)*u[2]
+    end
+
+    univ_de = (u, p, t) -> begin
+        x,y = u
+        z = UA(u,p)
+        [-x + z[1] + (x^2)*y,
+         b - a*y - (x^2)*y]
+    end
+
+    return (real_de!, univ_de)
+end
+
 """ NPZ Model, the short documentation!
 parameters_oscillation = Float32[0.2, 0.2, 0.4, 1.5, 0.03, 0.05, 0.15, 0.04, 0.6, 0.25, 0.33, 0.5, 0.6, 0.035]
 parameters_steadystate = Float32[0.2, 0.2, 0.4, 1.0, 0.03, 0.05, 0.15, 0.04, 0.6, 0.25, 0.33, 0.5, 0.6, 0.035]
