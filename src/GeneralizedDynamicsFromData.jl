@@ -4,8 +4,6 @@ using Reexport
 
 using LinearAlgebra
 using Optim
-using Plots
-using StatsPlots
 using Statistics
 using OrderedCollections
 using FileIO
