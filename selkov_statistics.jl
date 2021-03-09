@@ -7,9 +7,9 @@ experiment_name = "selkov_statistics"
 repetitions = 100
 
 weight_decay = 1e-4
-η = 1e-1
+η = 1e-2
 η_decay_rate = 0.5
-η_decay_step = 100
+η_decay_step = 800
 η_limit = 1e-4
 
 loss_weights = [0.2, 0.8]
@@ -28,9 +28,9 @@ net_config = OrderedDict([
     :initialization => Flux.glorot_normal
 ]) 
 
-problem_oscillation = Dict([:equation => genetic_toggle_switch,
+problem_oscillation = Dict([:equation => selkov,
                            :parameters => Float32[0.1, 0.6],
-                           :u0 => Float32[2.0, 4.0],
+                           :u0 => Float32[1.0, 1.0],
                            :tspan => (0.0f0, 15.0f0),
                            :ts => 0.1,
                            :solver => Tsit5,
@@ -51,7 +51,7 @@ for noise in [1e-2, 5e-3, 1e-3, 1e-4]
   save(filename_sum, summary)
 end
 
-problem_steadystate = Dict([:equation => genetic_toggle_switch,
+problem_steadystate = Dict([:equation => selkov,
                            :parameters => Float32[0.1, 0.15],
                            :u0 => Float32[1.0, 1.0],
                            :tspan => (0.0f0, 15.0f0),
