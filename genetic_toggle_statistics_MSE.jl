@@ -33,7 +33,7 @@ problem_one_stable = Dict([:equation => genetic_toggle_switch,
                            :ts => 0.1,
                            :solver => Tsit5,
                            :optimizer => construct_optimiser,
-                           :max_iter => 1000,
+                           :max_iter => 2000,
                            :loss => construct_loss]
                       )
 
@@ -56,7 +56,7 @@ problem_two_stable = Dict([:equation => genetic_toggle_switch,
                            :ts => 0.1,
                            :solver => Tsit5,
                            :optimizer => construct_optimiser,
-                           :max_iter => 1000,
+                           :max_iter => 2000,
                            :loss => construct_loss]
                          )
 
