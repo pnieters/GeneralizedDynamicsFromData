@@ -58,7 +58,7 @@ problem_steadystate = Dict([:equation => selkov,
                            :ts => 0.1,
                            :solver => Tsit5,
                            :optimizer => construct_optimiser,
-                           :max_iter => 1000,
+                           :max_iter => 3000,
                            :loss => construct_loss]
                          )
 
