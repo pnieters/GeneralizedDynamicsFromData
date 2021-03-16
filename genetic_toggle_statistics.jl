@@ -3,20 +3,20 @@ using OrderedCollections
 using JLD2
 using FileIO
 
-experiment_name = "genetic_toggle_statistics"
+experiment_name = "genetic_toggle_statistics_new"
 repetitions = 100
 
-weight_decay = 1e-4
-η = 1e-1
-η_decay_rate = 0.5
-η_decay_step = 100
-η_limit = 1e-4
-
+# weight_decay = 1e-4
+η = 1e-2
+# η_decay_rate = 0.5
+# η_decay_step = 100
+# η_limit = 1e-4
 loss_weights = [1/2, 1/2]
 
-construct_optimiser() = Flux.Optimiser(WeightDecay(weight_decay), 
-                                       ExpDecay(η,η_decay_rate,η_decay_step,η_limit), 
-                                       ADAM())
+# construct_optimiser() = Flux.Optimiser(WeightDecay(weight_decay), 
+#                                        ExpDecay(η,η_decay_rate,η_decay_step,η_limit), 
+#                                        ADAM())
+construct_optimiser() = ADAM(η) 
 construct_loss(θ, y, predict) = polar_loss(θ, y, loss_weights, predict)
 
 net_config = OrderedDict([
@@ -35,7 +35,7 @@ problem_one_stable = Dict([:equation => genetic_toggle_switch,
                            :ts => 0.1,
                            :solver => Tsit5,
                            :optimizer => construct_optimiser,
-                           :max_iter => 2000,
+                           :max_iter => 3000,
                            :loss => construct_loss]
                       )
 
@@ -58,7 +58,7 @@ problem_two_stable = Dict([:equation => genetic_toggle_switch,
                            :ts => 0.1,
                            :solver => Tsit5,
                            :optimizer => construct_optimiser,
-                           :max_iter => 2000,
+                           :max_iter => 3000,
                            :loss => construct_loss]
                          )
 
