@@ -52,8 +52,15 @@ ŷ = predict(trained_parameters)
 ŷ_derivs = UA(ŷ, trained_parameters)
 
 @variables u[1:2]
-b = polynomial_basis(u,5)
-basis = Basis(b, u)
+b = polynomial_basis(u,3)
+recp_polys = []
+for i = 1:3
+    push!(recp_polys, 1/(1+u[1]^i))
+    push!(recp_polys, 1/(1+u[2]^i))
+end
+gb = [b...; recp_polys...]
+basis = Basis(gb, u)
+
 
 opt = SR3(Float64(1e-2), Float64(1e-1))
 λ = exp10.(-7:0.1:5)
