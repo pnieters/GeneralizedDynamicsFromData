@@ -139,17 +139,27 @@ end
 function repeat_experiment(problem, 
                            net_config::OrderedDict, 
                            repetitions::Int; 
+                           longterm=0.0,
                            ε = 0.0, 
                            progress=true)
 
     callbacks = []
     min_losses = []
     min_params = []
+    longterm_predictions = []
 
     real_de, _ = problem[:equation](problem[:parameters], x->nothing)
     prob = ODEProblem(real_de, problem[:u0], problem[:tspan])
     solution = solve(prob, problem[:solver](), saveat=problem[:ts])
     y = Array(solution)
+
+    if !iszero(longterm)
+        prob_long = ODEProblem(real_de, problem[:u0], (problem[:tspan][1], longterm))
+        solution_long = solve(prob, problem[:solver](), saveat=problem[:ts])
+        y_long = Array(solution)
+    else
+        y_long = []
+    end
 
     Threads.@threads for _ in 1:repetitions
 
@@ -175,11 +185,27 @@ function repeat_experiment(problem,
         push!(callbacks, callback)
         push!(min_losses, res.minimum)
         push!(min_params, res.minimizer)
+
+        if !iszero(longterm)
+            new_tspan = (problem[:tspan][1], longterm)
+            prob_longerm = ODEProblem(univ_de, problem[:u0], new_tspan, res.minimizer)
+            longterm_prediction = Array(concrete_solve(
+                                                     prob_longerm, 
+                                                     problem[:solver](), 
+                                                     problem[:u0], 
+                                                     res.minimizer,
+                                                     saveat=problem[:ts]
+                                                     ))
+            push!(longterm_predictions, longterm_prediction)
+        end
+
     end
 
     return Dict([
         "losses" => min_losses,
         "parameters" => min_params,
+        "longterm_predictions" => longterm_predictions,
+        "longterm_solution" => y_long
     ]), callbacks
 
 end
