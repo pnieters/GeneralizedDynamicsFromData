@@ -45,8 +45,7 @@ function get_parameters(k_max)
 end
 
 
-
-params = get_parameters(2)
+params = get_parameters(7)
 
 for (id, p) in enumerate(params)
 
