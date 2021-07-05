@@ -3,7 +3,7 @@ using OrderedCollections
 using JLD2
 using FileIO
 
-experiment_name = "fritzhugh_nagumo_statistics_MSE"
+experiment_name = "fritzhugh_nagumo_bifurcation_study_MSE"
 repetitions = 50
 
 weight_decay = 1e-4

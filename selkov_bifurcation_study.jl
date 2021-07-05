@@ -3,7 +3,7 @@ using OrderedCollections
 using JLD2
 using FileIO
 
-experiment_name = "selkov_statistics"
+experiment_name = "selkov_bifurcation_study"
 repetitions = 50
 
 weight_decay = 1e-4
