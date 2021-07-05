@@ -50,7 +50,7 @@ for noise in [1e-2, 5e-3, 1e-3, 1e-4]
 end
 
 problem_two_stable = Dict([:equation => fritzhugh_nagumo,
-                           :parameters => Float64[0.9, 0.5, 1.9, 1.25],
+                           :parameters => Float64[0.9, 0.5, 1.0, 1.25],
                            :u0 => Float64[-2.0, -0.5],
                            :tspan => (0.0f0, 5.0f0),
                            :ts => 0.1,
