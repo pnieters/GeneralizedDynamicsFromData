@@ -1,6 +1,6 @@
 using GeneralizedDynamicsFromData
 using OrderedCollections
-using JLD2
+using HDF5
 using FileIO
 
 experiment_name = "fritzhugh_nagumo_bifurcation_study_MSE"
