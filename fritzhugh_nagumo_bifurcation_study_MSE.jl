@@ -50,7 +50,7 @@ params = get_parameters(7)
 for (id, p) in enumerate(params)
 
   problem= Dict([:equation => fritzhugh_nagumo,
-                  :parameters => Float64[0.9, 0.5, 1.9, 1.25],
+                  :parameters => p,
                   :u0 => Float64[-2.0, -0.5],
                   :tspan => (0.0f0, 5.0f0),
                   :ts => 0.1,
@@ -77,6 +77,7 @@ for (id, p) in enumerate(params)
       file["parameters"] = p
       file["losses"] = min_losses
       file["longterm_predictions"] = longterm_predictions
+      file["longterm_solution"] = longterm_solution
   end
 
 end
