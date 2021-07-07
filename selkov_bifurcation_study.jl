@@ -78,6 +78,7 @@ for (id, p) in enumerate(params)
       file["parameters"] = p
       file["losses"] = min_losses
       file["longterm_predictions"] = longterm_predictions
+      file["longterm_solution"] = longterm_solution
   end
 
 end
