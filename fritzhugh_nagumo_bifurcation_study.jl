@@ -52,7 +52,7 @@ for (id, p) in enumerate(params)
 
   problem= Dict([:equation => fritzhugh_nagumo,
                   :parameters => p,
-                  :u0 => Float64[-2.0, -0.5],
+                  :u0 => Float64[-2.0, -0.25],
                   :tspan => (0.0f0, 5.0f0),
                   :ts => 0.1,
                   :solver => Tsit5,
