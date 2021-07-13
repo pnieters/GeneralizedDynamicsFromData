@@ -38,7 +38,7 @@ initial_values = [ Float64[1.0 ,1.0],
                    Float64[0.5 ,6.0] ]
 
 params = [ [0.1, 0.6],    # oscillation
-           [0.1, 0.15],    # steadystate
+           [0.1, 0.15] ]   # steadystate
 
 for (id, u0) in enumerate(initial_values)
 
