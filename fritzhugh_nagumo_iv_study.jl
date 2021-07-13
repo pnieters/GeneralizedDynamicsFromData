@@ -63,7 +63,7 @@ for (id, u0) in enumerate(initial_values)
   longterm_predictions = cat([sol for sol in summary["longterm_predictions"]]...; dims=3)
   longterm_solution = cat([sol for sol in summary["longterm_solution"]]...; dims=3)
 
-  fn = joinpath("./data/", experiment_name*"_monostable_"*"_$(id).h5")
+  fn = joinpath("./data/", experiment_name*"_monostable_"*"$(id).h5")
 
   h5open(fn, "w") do file
       file["parameters"] = params[1]
@@ -99,7 +99,7 @@ for (id, u0) in enumerate(initial_values)
   longterm_predictions = cat([sol for sol in summary["longterm_predictions"]]...; dims=3)
   longterm_solution = cat([sol for sol in summary["longterm_solution"]]...; dims=3)
 
-  fn = joinpath("./data/", experiment_name*"_bistable_"*"_$(id).h5")
+  fn = joinpath("./data/", experiment_name*"_bistable_"*"$(id).h5")
 
   h5open(fn, "w") do file
       file["parameters"] = params[2]
